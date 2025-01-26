@@ -1,4 +1,5 @@
 "use client"
+//select from options dropdown
 export const Select = ({ options, onSelect }: {
     onSelect: (value: string) => void;
     options: {

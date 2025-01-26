@@ -38,7 +38,7 @@ export const authOptions = {
                         number: credentials.phone,
                         password: hashedPassword
                     }
-                });
+                });//add balances table mein paise
             
                 return {
                     id: user.id.toString(),

@@ -9,7 +9,7 @@ async function getBalance() {
     const session = await getServerSession(authOptions);
     const balance = await prisma.balance.findFirst({
         where: {
-            userId: Number(session?.user?.id)
+            userId: Number(session?.user?.id)//next auth se string hi aega number bhi
         }
     });
     return {

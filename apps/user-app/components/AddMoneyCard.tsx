@@ -27,8 +27,8 @@ export const AddMoney = () => {
             Bank
         </div>
         <Select onSelect={(value) => {
-            setRedirectUrl(SUPPORTED_BANKS.find(x => x.name === value)?.redirectUrl || "");
-            setProvider(SUPPORTED_BANKS.find(x => x.name === value)?.name || "");
+            setRedirectUrl(SUPPORTED_BANKS.find(x => x.name === value)?.redirectUrl || "");//bank ki url
+            setProvider(SUPPORTED_BANKS.find(x => x.name === value)?.name || "");//bank provider name set
         }} options={SUPPORTED_BANKS.map(x => ({
             key: x.name,
             value: x.name
@@ -36,7 +36,7 @@ export const AddMoney = () => {
         <div className="flex justify-center pt-4">
             <Button onClick={async () => {
                 await createOnRampTransaction(provider, value)
-                window.location.href = redirectUrl || "";
+                window.location.href = redirectUrl || "";//router.push same
             }}>
             Add Money
             </Button>
