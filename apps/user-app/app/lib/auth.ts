@@ -36,9 +36,28 @@ export const authOptions = {
                 const user = await db.user.create({
                     data: {
                         number: credentials.phone,
-                        password: hashedPassword
+                        password: hashedPassword,
+                        Balance:{
+                            create:{
+                                amount:20000,
+                                locked:0
+                            }
+                        },
+                        OnRampTransaction:{
+                            create:{
+                                status:"Success",
+                                token:crypto.randomUUID(),//comes in node
+                                amount:20000,
+                                startTime:new Date(),
+                                provider:"PayTM Bonus"
+                            }
+                        }
+                    },
+                    include:{
+                        Balance:true,
+                        OnRampTransaction:true
                     }
-                });//add balances table mein paise
+                });
             
                 return {
                     id: user.id.toString(),

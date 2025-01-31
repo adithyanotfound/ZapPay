@@ -14,7 +14,7 @@ export function SendCard() {
         <Center>
             <Card title="Send">
                 <div className="min-w-72 pt-2">
-                    <TextInput placeholder={"Number"} label="Number" onChange={(value) => {
+                    <TextInput placeholder={"Number"} label="Mobile Number" onChange={(value) => {
                         setNumber(value)
                     }} />
                     <TextInput placeholder={"Amount"} label="Amount" onChange={(value) => {
