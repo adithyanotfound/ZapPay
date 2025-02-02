@@ -51,11 +51,26 @@ export const authOptions = {
                                 startTime:new Date(),
                                 provider:"PayTM Bonus"
                             }
+                        },
+                        Axis:{
+                            create:{
+                                amount: 1000000,
+                                locked: 0
+                            }
+                        },
+                        HDFC:{
+                            create:{
+                                amount:1000000,
+                                locked:0
+                            }
                         }
+
                     },
                     include:{
                         Balance:true,
-                        OnRampTransaction:true
+                        OnRampTransaction:true,
+                        Axis:true,
+                        HDFC:true
                     }
                 });
             
