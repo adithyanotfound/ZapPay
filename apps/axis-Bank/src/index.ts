@@ -50,6 +50,10 @@ app.post("/axisBank", async (req, res): Promise<any> => {
   }
 });
 
+app.post("/axisBankWithdrawl", async (req, res): Promise<any> => {
+    const { token, userId, amount } = req.body;
+})
+
 
 app.listen(3004);
 

@@ -51,4 +51,8 @@ app.post("/hdfcBank", async (req, res):Promise<any> => {
     
 })
 
+app.post("/hdfcBankWithdrawl", async (req, res): Promise<any> => {
+    const { token, userId, amount } = req.body;
+})
+
 app.listen(3005);
