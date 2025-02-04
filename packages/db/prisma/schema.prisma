@@ -21,6 +21,8 @@ model User {
 
   Axis AxisBank?//one to one relation
   HDFC HDFCBank?
+
+  OffRampTransaction OffRampTransaction[]
 }
 
 model Merchant {
@@ -84,4 +86,15 @@ enum OnRampStatus {
   Success
   Failure
   Processing
+}
+
+model OffRampTransaction {
+  id        Int          @id @default(autoincrement())
+  status    OnRampStatus//Success failure processing
+  token     String       @unique
+  provider  String
+  amount    Int
+  startTime DateTime
+  userId    Int
+  user      User         @relation(fields: [userId], references: [id])
 }
