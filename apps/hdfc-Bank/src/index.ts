@@ -53,6 +53,30 @@ app.post("/hdfcBank", async (req, res):Promise<any> => {
 
 app.post("/hdfcBankWithdrawl", async (req, res): Promise<any> => {
     const { token, userId, amount } = req.body;
+
+    try{
+        await db.hDFCBank.update({
+            where:{
+                userId:Number(userId)
+            },
+            data:{
+                locked:{
+                    increment:Number(amount)
+                }
+            }
+        })
+
+        await axios.post("http://localhost:3003/hdfcWebWithdrawl", { token, user_identifier: userId, amount });
+        console.log("webhook se aagye sb badhiya")
+        return res.json({ message: "Webhook triggered successfully" });
+
+    }
+    catch (error) {
+        console.error("HDFCBank error:", error);
+        return res.status(500).json({
+           message: "Hdfc mein aya kuch to" 
+        });
+    }
 })
 
 app.listen(3005);

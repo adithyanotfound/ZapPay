@@ -100,6 +100,13 @@ app.post("/axisWebhook", async (req, res) => {
         return res.status(500).json({ message: "Error processing webhook" });
     }
 })
+
+app.post("/axisWebWithdrawl",async (req,res):Promise<any>=>{
+
+})
+app.post("/hdfcWebWithdrawl",async (req,res):Promise<any>=>{
+    
+})
 app.listen(3003);
 
 function cors(): any {
