@@ -35,7 +35,7 @@ export async function createOffRampTransaction(provider: string, amount: number)
       }
     });
 
-    await prisma.balance.update({
+    await prisma.balance.updateMany({
       where:{userId:Number(session.user.id)},
       data:{
         locked :{increment: amount},

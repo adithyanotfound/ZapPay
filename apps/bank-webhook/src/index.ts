@@ -102,10 +102,94 @@ app.post("/axisWebhook", async (req, res) => {
 })
 
 app.post("/axisWebWithdrawl",async (req,res):Promise<any>=>{
+    const { token, amount } = req.body;
+    const userId=req.body.user_identifier;
 
+    try{
+        await db.$transaction([
+            db.balance.update({
+                where: { userId: Number(userId) },
+                data:{
+                    locked: { decrement: Number(amount)}
+                }
+            }),
+            db.axisBank.updateMany({
+                where:{userId:Number(userId)},
+                data:{
+                    locked:{decrement:Number(amount)},
+                    amount:{increment:Number(amount)}
+                }
+            })
+        ])
+    }
+    catch (error) 
+    {
+        console.error("Error in axisWebhook:", error);
+
+        // Rollback funds in case of failure
+        await db.$transaction([
+            db.axisBank.update({
+                where: { userId: Number(userId) },
+                data: {
+                    locked: { decrement: Number(amount) }
+                }
+            }),
+            db.balance.updateMany({
+                where:{userId:Number(userId)},
+                data:{
+                    locked:{decrement:Number(amount)},
+                    amount:{increment:Number(amount)}
+                }
+            })
+        ])
+
+        return res.status(500).json({ message: "Error processing webhook" });
+    }
 })
 app.post("/hdfcWebWithdrawl",async (req,res):Promise<any>=>{
-    
+    const { token, amount } = req.body;
+    const userId=req.body.user_identifier;
+
+    try{
+        await db.$transaction([
+            db.balance.update({
+                where: { userId: Number(userId) },
+                data:{
+                    locked: { decrement: Number(amount)}
+                }
+            }),
+            db.hDFCBank.updateMany({
+                where:{userId:Number(userId)},
+                data:{
+                    locked:{decrement:Number(amount)},
+                    amount:{increment:Number(amount)}
+                }
+            })
+        ])
+    }
+    catch (error) 
+    {
+        console.error("Error in hdfcWebhook:", error);
+
+        // Rollback funds in case of failure
+
+        await db.$transaction([
+            db.hDFCBank.updateMany({
+                where: { userId: Number(userId) },
+                data: {
+                    locked: { decrement: Number(amount) }
+                }
+            }),
+            db.balance.updateMany({
+                where:{userId:Number(userId)},
+                data:{
+                    locked:{decrement:Number(amount)},
+                    amount:{increment:Number(amount)}
+                }
+            })
+        ])
+        return res.status(500).json({ message: "Error processing webhook" });
+    }
 })
 app.listen(3003);
 
