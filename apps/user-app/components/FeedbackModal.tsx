@@ -8,7 +8,7 @@ interface FeedbackModalProps {
 }
 
 const FeedbackModal: React.FC<FeedbackModalProps> = ({ message, type, onClose }) => {
-    if (!message) {
+    if (!message) {//message pe chlra hai feedback joki onclick close pe close
         return null;
     }
 
@@ -18,11 +18,11 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ message, type, onClose })
 
     return (
         <div className="fixed top-0 left-0 w-full h-full bg-black/50 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-12 shadow-md flex flex-col items-center w-96"> {/* Increased width */}
-                <div className="text-2xl font-bold mb-4">{title}</div> {/* Title added */}
+            <div className="bg-white rounded-lg p-12 shadow-md flex flex-col items-center w-96"> 
+                <div className="text-2xl font-bold mb-4">{title}</div> 
                 <Icon className={`h-24 w-24 ${iconColor} mb-4`} />
-                <p className="text-lg text-center mb-6">{message}</p> {/* Increased margin bottom */}
-                <button onClick={onClose} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"> {/* Increased padding */}
+                <p className="text-lg text-center mb-6">{message}</p> 
+                <button onClick={onClose} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"> 
                     Close
                 </button>
             </div>
