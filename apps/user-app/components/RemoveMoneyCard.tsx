@@ -6,6 +6,7 @@ import { useState } from "react";
 import { TextInput } from "@repo/ui/textinput";
 import { createOffRampTransaction } from "../app/lib/actions/createOfframpTransaction";
 import { useRouter } from "next/navigation";
+import LoadingIndicator from './Loader';
 
 const SUPPORTED_BANKS = [{
     name: "HDFC Bank",
@@ -19,6 +20,7 @@ export const RemoveMoney = () => {
     const [redirectUrl, setRedirectUrl] = useState(SUPPORTED_BANKS[0]?.redirectUrl);
     const [provider, setProvider] = useState(SUPPORTED_BANKS[0]?.name || "");
     const [value, setValue] = useState(0)
+    const [loading,setLoading]=useState(false);
     const router=useRouter()
     return <Card title="Add Money">
     <div className="w-full">
@@ -37,17 +39,21 @@ export const RemoveMoney = () => {
         }))} />
         <div className="flex justify-center pt-4">
             <Button onClick={async () => {
+                setLoading(true);
                 try {
-                    const result=await createOffRampTransaction(provider, value);
-                    alert(result.message)
-                    router.refresh(); // Keep this for after the redirect if needed
+                    const result = await createOffRampTransaction(provider, value);
+                    alert(result.message);
+                    router.refresh();
                 } catch (error) {
-                    console.error("Error during redirect:", error); // Log the actual error
-                    alert("An error occurred: "); // Or a more user-friendly message
+                    console.error("Error during transaction:", error);
+                    alert("An error occurred during the transaction.");
+                } finally {
+                    setLoading(false);
                 }
             }}>
-            Add Money
+                Add Money
             </Button>
+            <LoadingIndicator loading={loading} text="Processing..." />
         </div>
     </div>
 </Card>
