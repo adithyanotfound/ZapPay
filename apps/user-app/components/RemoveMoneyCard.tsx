@@ -7,6 +7,7 @@ import { TextInput } from "@repo/ui/textinput";
 import { createOffRampTransaction } from "../app/lib/actions/createOfframpTransaction";
 import { useRouter } from "next/navigation";
 import LoadingIndicator from './Loader';
+import FeedbackModal from './FeedbackModal';
 
 const SUPPORTED_BANKS = [{
     name: "HDFC Bank",
@@ -21,6 +22,16 @@ export const RemoveMoney = () => {
     const [provider, setProvider] = useState(SUPPORTED_BANKS[0]?.name || "");
     const [value, setValue] = useState(0)
     const [loading,setLoading]=useState(false);
+
+    const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+    const [feedbackType, setFeedbackType] = useState<'success' | 'error' | null>(null);
+
+    const handleFeedbackClose = () => {
+        setFeedbackMessage(null);
+        setFeedbackType(null);
+    };
+
+
     const router=useRouter()
     return <Card title="Add Money">
     <div className="w-full">
@@ -42,11 +53,13 @@ export const RemoveMoney = () => {
                 setLoading(true);
                 try {
                     const result = await createOffRampTransaction(provider, value);
-                    alert(result.message);
+                    setFeedbackMessage(result.message);
+                    setFeedbackType('success');
                     router.refresh();
                 } catch (error) {
                     console.error("Error during transaction:", error);
-                    alert("An error occurred during the transaction.");
+                    setFeedbackMessage("An error occurred during the transaction.");
+                    setFeedbackType('error');
                 } finally {
                     setLoading(false);
                 }
@@ -55,6 +68,11 @@ export const RemoveMoney = () => {
             </Button>
             <LoadingIndicator loading={loading} text="Processing..." />
         </div>
+        <FeedbackModal 
+                message={feedbackMessage} 
+                type={feedbackType} 
+                onClose={handleFeedbackClose} 
+            />
     </div>
 </Card>
 }

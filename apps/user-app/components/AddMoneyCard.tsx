@@ -7,6 +7,8 @@ import { TextInput } from "@repo/ui/textinput";
 import { createOnRampTransaction } from "../app/lib/actions/createOnrampTransaction";
 import { useRouter } from "next/navigation";
 import LoadingIndicator from './Loader';
+import FeedbackModal from './FeedbackModal';
+
 const SUPPORTED_BANKS = [{
     name: "HDFC Bank",
     redirectUrl: "https://netbanking.hdfcbank.com"
@@ -21,6 +23,16 @@ export const AddMoney = () => {
     const [value, setValue] = useState(0)
     const [loading,setLoading]=useState(false);
     const router=useRouter()
+
+
+    const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+    const [feedbackType, setFeedbackType] = useState<'success' | 'error' | null>(null);
+
+    const handleFeedbackClose = () => {
+        setFeedbackMessage(null);
+        setFeedbackType(null);
+    };
+
     return <Card title="Add Money">
     <div className="w-full">
         <TextInput label={"Amount"} placeholder={"Amount"} onChange={(val) => {
@@ -41,13 +53,15 @@ export const AddMoney = () => {
                 setLoading(true);
                 try{
                     const result=await createOnRampTransaction(provider, value)
-                    alert(result.message)
+                    setFeedbackMessage(result.message);
+                    setFeedbackType('success');
                     router.refresh();
                 }
 
                 catch (error) {
-                    console.error("Error during redirect:", error); // Log the actual error
-                    alert("An error occurred"); // Or a more user-friendly message
+                    console.error("Error during transaction:", error);
+                    setFeedbackMessage("An error occurred during the transaction.");
+                    setFeedbackType('error');
                 }finally {
                     setLoading(false);
                 }
@@ -56,6 +70,11 @@ export const AddMoney = () => {
             </Button>
             <LoadingIndicator loading={loading} text="Processing..." />
         </div>
+        <FeedbackModal 
+                message={feedbackMessage} 
+                type={feedbackType} 
+                onClose={handleFeedbackClose} 
+            />
     </div>
 </Card>
 }
