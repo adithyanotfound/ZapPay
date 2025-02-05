@@ -5,6 +5,7 @@ import { Select } from "@repo/ui/select";
 import { useState } from "react";
 import { TextInput } from "@repo/ui/textinput";
 import { createOffRampTransaction } from "../app/lib/actions/createOfframpTransaction";
+import { useRouter } from "next/navigation";
 
 const SUPPORTED_BANKS = [{
     name: "HDFC Bank",
@@ -18,6 +19,7 @@ export const RemoveMoney = () => {
     const [redirectUrl, setRedirectUrl] = useState(SUPPORTED_BANKS[0]?.redirectUrl);
     const [provider, setProvider] = useState(SUPPORTED_BANKS[0]?.name || "");
     const [value, setValue] = useState(0)
+    const router=useRouter()
     return <Card title="Add Money">
     <div className="w-full">
         <TextInput label={"Amount"} placeholder={"Amount"} onChange={(val) => {
@@ -36,7 +38,8 @@ export const RemoveMoney = () => {
         <div className="flex justify-center pt-4">
             <Button onClick={async () => {
                 await createOffRampTransaction(provider, value)
-                window.location.href = redirectUrl || "";//router.push same
+                window.location.href = redirectUrl || "";
+                router.refresh();
             }}>
             Add Money
             </Button>

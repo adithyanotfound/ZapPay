@@ -15,7 +15,7 @@ export async function createOffRampTransaction(provider: string, amount: number)
   
   const balance=prisma.balance.findUnique({
     where:{
-      userId:Number(session.userId.id)
+      userId:Number(session.user.id)
     }
   })
 //@ts-ignore
@@ -23,26 +23,31 @@ export async function createOffRampTransaction(provider: string, amount: number)
   {
     return {message:"Not Enough amount"};
   }
-  try{
-    await prisma.offRampTransaction.create({
-      data: {
-          provider,
-          status: "Processing", // Use Enum in schema if possible
-          startTime: new Date(),
-          token,
-          userId: Number(session.user.id),
-          amount: amount * 100
-      }
-    });
-
-    await prisma.balance.updateMany({
-      where:{userId:Number(session.user.id)},
-      data:{
-        locked :{increment: amount},
-        amount :{decrement:amount}
-      }
-    })
-
+  try
+  {
+    
+    await prisma.$transaction([
+      prisma.offRampTransaction.create({
+        data: {
+            provider,
+            status: "Processing", // Use Enum in schema if possible
+            startTime: new Date(),
+            token,
+            userId: Number(session.user.id),
+            amount: amount * 100
+        }
+      })
+      ,
+      prisma.balance.updateMany({
+        where:{userId:Number(session.user.id)},
+        data:{
+          locked :{increment: amount*100},
+          amount :{decrement:amount*100}
+        }
+      })
+    ])
+    console.log("OffRampTransaction created and wallet se locked mei daal diya")
+    
     const bankEndpoint = provider === "Axis Bank" ? "http://localhost:3004/axisBankWithdrawl" : "http://localhost:3005/hdfcBankWithdrawl";
     
     await axios.post(bankEndpoint,{token, userId: Number(session.user.id), amount:(Number(amount)*100 )})

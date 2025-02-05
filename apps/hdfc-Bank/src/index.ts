@@ -55,6 +55,17 @@ app.post("/hdfcBankWithdrawl", async (req, res): Promise<any> => {
     const { token, userId, amount } = req.body;
 
     try{
+
+        console.log("hdfc mei aagya")
+
+        const transaction = await db.offRampTransaction.findUnique({
+            where: { userId: Number(userId), token }
+        });
+  
+        if (!transaction || transaction.status !== "Processing") {
+            return res.status(400).json({ message: "Invalid transaction status" });
+        }
+
         await db.hDFCBank.update({
             where:{
                 userId:Number(userId)
@@ -65,6 +76,7 @@ app.post("/hdfcBankWithdrawl", async (req, res): Promise<any> => {
                 }
             }
         })
+        console.log("hdfc mei lock krdiya")
 
         await axios.post("http://localhost:3003/hdfcWebWithdrawl", { token, user_identifier: userId, amount });
         console.log("webhook se aagye sb badhiya")

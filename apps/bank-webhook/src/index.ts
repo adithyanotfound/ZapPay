@@ -42,13 +42,20 @@ app.post("/hdfcWebhook", async (req, res) => {
         console.error("Error in hdfcWebhook:", error);
 
         // Rollback funds in case of failure
-        await db.axisBank.updateMany({
-            where: { userId: Number(userId) },
-            data: {
-                locked: { decrement: Number(amount) },
-                amount: { increment: Number(amount) }
-            }
-        });
+        await db.$transaction([
+            db.axisBank.updateMany({
+                where: { userId: Number(userId) },
+                data: {
+                    locked: { decrement: Number(amount) },
+                    amount: { increment: Number(amount) }
+                }
+            }),
+            db.onRampTransaction.update({
+                where: { token },
+                data: { status: "Failure" }
+            })
+
+        ])
 
         return res.status(500).json({ message: "Error processing webhook" });
     }
@@ -89,14 +96,20 @@ app.post("/axisWebhook", async (req, res) => {
         console.error("Error in axisWebhook:", error);
 
         // Rollback funds in case of failure
-        await db.axisBank.updateMany({
-            where: { userId: Number(userId) },
-            data: {
-                locked: { decrement: Number(amount) },
-                amount: { increment: Number(amount) }
-            }
-        });
-
+        await db.$transaction([
+            db.axisBank.updateMany({
+                where: { userId: Number(userId) },
+                data: {
+                    locked: { decrement: Number(amount) },
+                    amount: { increment: Number(amount) }
+                }
+            }),
+            db.onRampTransaction.update({
+                where: { token },
+                data: { status: "Failure" }
+            })
+        ])
+        
         return res.status(500).json({ message: "Error processing webhook" });
     }
 })
@@ -106,6 +119,7 @@ app.post("/axisWebWithdrawl",async (req,res):Promise<any>=>{
     const userId=req.body.user_identifier;
 
     try{
+        console.log("webhook aagye")
         await db.$transaction([
             db.balance.update({
                 where: { userId: Number(userId) },
@@ -119,8 +133,14 @@ app.post("/axisWebWithdrawl",async (req,res):Promise<any>=>{
                     locked:{decrement:Number(amount)},
                     amount:{increment:Number(amount)}
                 }
+            }),
+            db.offRampTransaction.update({
+                where: { token },
+                data: { status: "Success" }
             })
+
         ])
+        console.log("sab DONE")
     }
     catch (error) 
     {
@@ -140,6 +160,10 @@ app.post("/axisWebWithdrawl",async (req,res):Promise<any>=>{
                     locked:{decrement:Number(amount)},
                     amount:{increment:Number(amount)}
                 }
+            }),
+            db.offRampTransaction.update({
+                where: { token },
+                data: { status: "Failure" }
             })
         ])
 
@@ -151,6 +175,7 @@ app.post("/hdfcWebWithdrawl",async (req,res):Promise<any>=>{
     const userId=req.body.user_identifier;
 
     try{
+        console.log("webhook aagye")
         await db.$transaction([
             db.balance.update({
                 where: { userId: Number(userId) },
@@ -164,8 +189,13 @@ app.post("/hdfcWebWithdrawl",async (req,res):Promise<any>=>{
                     locked:{decrement:Number(amount)},
                     amount:{increment:Number(amount)}
                 }
+            }),
+            db.offRampTransaction.update({
+                where: { token },
+                data: { status: "Success" }
             })
         ])
+        console.log("sab DONE")
     }
     catch (error) 
     {
@@ -186,6 +216,10 @@ app.post("/hdfcWebWithdrawl",async (req,res):Promise<any>=>{
                     locked:{decrement:Number(amount)},
                     amount:{increment:Number(amount)}
                 }
+            }),
+            db.offRampTransaction.update({
+                where: { token },
+                data: { status: "Failure" }
             })
         ])
         return res.status(500).json({ message: "Error processing webhook" });
