@@ -34,6 +34,10 @@ export async function createOnRampTransaction(provider: string, amount: number) 
         console.log("Bank ko Post krdia")
         return { message: "Done" };
     } catch (error) {
+        await prisma.onRampTransaction.update({
+            where: { token },
+            data: { status: "Failure" }
+        })
         console.error("Error creating OnRampTransaction:", error);
         return { message: "Transaction failed" };
     }

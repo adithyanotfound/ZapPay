@@ -12,19 +12,18 @@ export async function createOffRampTransaction(provider: string, amount: number)
   }
   
   const token = crypto.randomUUID();
-  
-  const balance=prisma.balance.findUnique({
-    where:{
-      userId:Number(session.user.id)
-    }
-  })
-//@ts-ignore
-  if(balance?.amount<amount)
-  {
-    return {message:"Not Enough amount"};
-  }
   try
   {
+    const balance=await prisma.balance.findUnique({
+      where:{
+        userId:Number(session.user.id)
+      }
+    })
+    //@ts-ignore
+    if(balance?.amount<amount)
+    {
+      throw new Error("Not enough Balance");
+    }
     
     await prisma.$transaction([
       prisma.offRampTransaction.create({
@@ -55,8 +54,20 @@ export async function createOffRampTransaction(provider: string, amount: number)
     return { message: "Done" };
   }
   catch(error){
+    await prisma.balance.update({
+      where:{userId:Number(session.user.id)},
+      data:{
+        locked :{decrement: amount*100},
+        amount :{increment:amount*100}
+      }
+    })
+    await prisma.offRampTransaction.update({
+      where: { token },
+      data: { status: "Failure" }
+    })
     console.error("Error creating OffRampTransaction:", error);
     return { message: "Withdrawl failed" };
+    
 
   }
 }

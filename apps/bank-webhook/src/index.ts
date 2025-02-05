@@ -141,6 +141,7 @@ app.post("/axisWebWithdrawl",async (req,res):Promise<any>=>{
 
         ])
         console.log("sab DONE")
+        return res.json({ message: "Captured successfully" });
     }
     catch (error) 
     {
@@ -196,6 +197,7 @@ app.post("/hdfcWebWithdrawl",async (req,res):Promise<any>=>{
             })
         ])
         console.log("sab DONE")
+        return res.json({ message: "Captured successfully" });
     }
     catch (error) 
     {

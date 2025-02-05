@@ -76,7 +76,7 @@ app.post("/axisBankWithdrawl", async (req, res): Promise<any> => {
 
         await axios.post("http://localhost:3003/axisWebWithdrawl", { token, user_identifier: userId, amount });
         console.log("webhook se aagye sb badhiya")
-        return res.json({ message: "Webhook triggered successfully" });
+        return res.status(200).json({ message: "Webhook triggered successfully" });
 
     }
     catch (error) {

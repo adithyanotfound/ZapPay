@@ -37,9 +37,14 @@ export const RemoveMoney = () => {
         }))} />
         <div className="flex justify-center pt-4">
             <Button onClick={async () => {
-                await createOffRampTransaction(provider, value)
-                window.location.href = redirectUrl || "";
-                router.refresh();
+                try {
+                    const result=await createOffRampTransaction(provider, value);
+                    alert(result.message)
+                    router.refresh(); // Keep this for after the redirect if needed
+                } catch (error) {
+                    console.error("Error during redirect:", error); // Log the actual error
+                    alert("An error occurred: "); // Or a more user-friendly message
+                }
             }}>
             Add Money
             </Button>

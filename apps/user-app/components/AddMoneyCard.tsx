@@ -5,7 +5,7 @@ import { Select } from "@repo/ui/select";
 import { useState } from "react";
 import { TextInput } from "@repo/ui/textinput";
 import { createOnRampTransaction } from "../app/lib/actions/createOnrampTransaction";
-
+import { useRouter } from "next/navigation";
 const SUPPORTED_BANKS = [{
     name: "HDFC Bank",
     redirectUrl: "https://netbanking.hdfcbank.com"
@@ -18,6 +18,7 @@ export const AddMoney = () => {
     const [redirectUrl, setRedirectUrl] = useState(SUPPORTED_BANKS[0]?.redirectUrl);
     const [provider, setProvider] = useState(SUPPORTED_BANKS[0]?.name || "");
     const [value, setValue] = useState(0)
+    const router=useRouter()
     return <Card title="Add Money">
     <div className="w-full">
         <TextInput label={"Amount"} placeholder={"Amount"} onChange={(val) => {
@@ -35,8 +36,16 @@ export const AddMoney = () => {
         }))} />
         <div className="flex justify-center pt-4">
             <Button onClick={async () => {
-                await createOnRampTransaction(provider, value)
-                window.location.href = redirectUrl || "";//router.push same
+                try{
+                    const result=await createOnRampTransaction(provider, value)
+                    alert(result.message)
+                    router.refresh();
+                }
+
+                catch (error) {
+                    console.error("Error during redirect:", error); // Log the actual error
+                    alert("An error occurred"); // Or a more user-friendly message
+                }
             }}>
             Add Money
             </Button>
