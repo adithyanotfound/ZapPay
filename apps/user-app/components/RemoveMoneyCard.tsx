@@ -33,7 +33,7 @@ export const RemoveMoney = () => {
 
 
     const router=useRouter()
-    return <Card title="Add Money">
+    return <Card title="Withdraw Money">
     <div className="w-full">
         <TextInput label={"Amount"} placeholder={"Amount"} onChange={(val) => {
             setValue(Number(val))
@@ -64,7 +64,7 @@ export const RemoveMoney = () => {
                     setLoading(false);
                 }
             }}>
-                Add Money
+                Withdraw Money
             </Button>
             <LoadingIndicator loading={loading} text="Processing..." />
         </div>

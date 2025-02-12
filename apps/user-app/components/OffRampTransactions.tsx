@@ -12,15 +12,15 @@ export const OffRampTransactions = ({
     }[]
 }) => {
     if (!transactions.length) {
-        return <Card title="Recent Withdrawls">
+        return <Card title="Recent Withdrawals">
             <div className="text-center pb-8 pt-8">
-                No Recent withdrawls
+                No Recent withdrawals
             </div>
         </Card>
     }
     return <Card title="Recent Withdrawls">
         <div className="pt-2">
-            {transactions.map(t => <div className="flex justify-between">
+            {transactions.map(t => <div className="flex justify-between mt-3">
                 <div>
                     <div className="text-sm">
                         Received INR
