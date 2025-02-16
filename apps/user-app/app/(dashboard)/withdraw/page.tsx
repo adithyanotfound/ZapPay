@@ -5,52 +5,48 @@ import prisma from "@repo/db/client";
 import { BalanceCard } from "../../../components/BalanceCard";
 import { OffRampTransactions } from "../../../components/OffRampTransactions";
 
-export default async function() {
-
+export default async function () {
   const balance = await getBalance();
   const transactions = await getOffRampTransactions();
 
-  return <div className="w-screen">
-    <div className="text-4xl text-[#6a51a6] pt-8 mb-8 font-bold">
-      Withdraw Funds
-    </div>
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 p-4">
-      <div>
-          <RemoveMoney />
+  return (
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 className="text-4xl text-[#6a51a6] pt-8 mb-8 font-bold">Withdrawal</h1>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="w-full">
+        <RemoveMoney />
       </div>
-      <div>
-          <BalanceCard amount={balance.amount} locked={balance.locked} />
-          <div className="pt-4">
-              <OffRampTransactions transactions={transactions} />
-          </div>
+      <div className="space-y-6">
+        <BalanceCard amount={balance.amount} locked={balance.locked} />
+        <OffRampTransactions transactions={transactions} />
       </div>
     </div>
   </div>
-}
+)}
 
 async function getBalance() {
   const session = await getServerSession(authOptions);
   const balance = await prisma.balance.findFirst({
-      where: {
-          userId: Number(session?.user?.id)//next auth se string hi aega number bhi
-      }
+    where: {
+      userId: Number(session?.user?.id)//next auth se string hi aega number bhi
+    }
   });
   return {
-      amount: balance?.amount || 0,
-      locked: balance?.locked || 0
+    amount: balance?.amount || 0,
+    locked: balance?.locked || 0
   }
 }
 async function getOffRampTransactions() {
   const session = await getServerSession(authOptions);
   const txns = await prisma.offRampTransaction.findMany({
-      where: {
-          userId: Number(session?.user?.id)
-      }
+    where: {
+      userId: Number(session?.user?.id)
+    }
   });
   return txns.map(t => ({
-      time: t.startTime,
-      amount: t.amount,
-      status: t.status,
-      provider: t.provider
+    time: t.startTime,
+    amount: t.amount,
+    status: t.status,
+    provider: t.provider
   }))
 }

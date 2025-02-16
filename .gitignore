@@ -19,6 +19,7 @@ coverage
 .turbo
 
 # Vercel
+next-env.d.ts
 .vercel
 
 # Build Outputs

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 export default function LoginPage() {
     const [phone, setPhone] = useState("")
@@ -25,9 +26,10 @@ export default function LoginPage() {
         setLoading(false)
 
         if (result?.ok) {
+            toast.success("Signed in successfully");
             router.push('/dashboard')
         } else {
-            alert(result?.error || "Authentication failed")
+            toast.error(result?.error || "Authentication failed");
         }
     }
 
