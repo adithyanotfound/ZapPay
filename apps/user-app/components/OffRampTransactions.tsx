@@ -22,9 +22,7 @@ export const OffRampTransactions = ({
         <div className="pt-2">
             {transactions.map(t => <div className="flex justify-between mt-3">
                 <div>
-                    <div className="text-sm">
-                        Received INR
-                    </div>
+                    <div className={`${t.status === "Success" ? "text-green-500 " : "text-red-500"}`}>{t.status}</div>
                     <div className="text-slate-600 text-xs">
                         {t.time.toDateString()}
                     </div>
