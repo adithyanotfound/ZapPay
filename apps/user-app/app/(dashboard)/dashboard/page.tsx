@@ -71,7 +71,7 @@ export default async function Dashboard() {
           <ArrowDownRight className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalExpenses}</div>
+          <div className="text-2xl font-bold">{totalExpenses/100}</div>
           <p className="text-xs text-muted-foreground">-5.2% from last month</p>
         </CardContent>
       </Card>
