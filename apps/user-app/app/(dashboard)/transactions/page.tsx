@@ -1,15 +1,57 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import prisma from "@repo/db/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../lib/auth";
 
-const transactions = [
-    { id: 1, date: "2023-06-01", description: "Received from John Doe", amount: 100, type: "credit" },
-    { id: 2, date: "2023-06-02", description: "Sent to Jane Smith", amount: 50, type: "debit" },
-    { id: 3, date: "2023-06-03", description: "Added from Bank Account", amount: 200, type: "credit" },
-    { id: 4, date: "2023-06-04", description: "Coffee Shop", amount: 5, type: "debit" },
-    { id: 5, date: "2023-06-05", description: "Salary Deposit", amount: 3000, type: "credit" },
-]
+async function getTransactions() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return [];
 
-export default function TransactionHistory() {
+    const userId = Number(session.user.id);
+
+    const sentTransactions = await prisma.p2pTransfer.findMany({
+        where: { fromUserId: userId },
+        select: {
+            id: true,
+            timestamp: true,
+            amount: true,
+            toUser: { select: { number: true } }
+        }
+    });
+
+    const receivedTransactions = await prisma.p2pTransfer.findMany({
+        where: { toUserId: userId },
+        select: {
+            id: true,
+            timestamp: true,
+            amount: true,
+            fromUser: { select: { number: true } }
+        }
+    });
+
+    return [
+        ...sentTransactions.map(tx => ({
+            id: tx.id,
+            date: new Date(tx.timestamp),
+            user: tx.toUser.number,
+            amount: tx.amount,
+            type: "debit"
+        })),
+        ...receivedTransactions.map(tx => ({
+            id: tx.id,
+            date: new Date(tx.timestamp),
+            user: tx.fromUser.number,
+            amount: tx.amount,
+            type: "credit"
+        }))
+    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .map(tx => ({ ...tx, date: tx.date.toISOString().split("T")[0] }));
+}
+
+export default async function TransactionHistory() {
+    const transactions = await getTransactions();
+
     return (
         <div className="p-8">
             <Card>
@@ -22,27 +64,34 @@ export default function TransactionHistory() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Date</TableHead>
-                                <TableHead>Description</TableHead>
+                                <TableHead>Sender / Recipient</TableHead>
                                 <TableHead>Amount</TableHead>
                                 <TableHead>Type</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {transactions.map((transaction) => (
-                                <TableRow key={transaction.id}>
-                                    <TableCell>{transaction.date}</TableCell>
-                                    <TableCell>{transaction.description}</TableCell>
-                                    <TableCell>${transaction.amount.toFixed(2)}</TableCell>
-                                    <TableCell className={transaction.type === "credit" ? "text-green-600" : "text-red-600"}>
-                                        {transaction.type === "credit" ? "+" : "-"}
+                            {transactions.length > 0 ? (
+                                transactions.map((transaction) => (
+                                    <TableRow key={transaction.id}>
+                                        <TableCell>{transaction.date}</TableCell>
+                                        <TableCell>{transaction.user}</TableCell>
+                                        <TableCell>&#8377; {transaction.amount / 100}</TableCell>
+                                        <TableCell className={transaction.type === "credit" ? "text-green-600" : "text-red-600"}>
+                                            {transaction.type === "credit" ? "+" : "-"}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="text-center text-gray-500">
+                                        No transactions found
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>
             </Card>
         </div>
-
-    )
+    );
 }
