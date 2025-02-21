@@ -29,6 +29,21 @@ async function totalP2P(userId: number) {
   return totalAmount._sum.amount ?? 0;
 }
 
+async function getAxisAmount(userId:number){
+  const data=await prisma.axisBank.findUnique({
+    where:{userId}
+  })
+
+  return data?.amount ?? 0;
+}
+async function getHdfcAmount(userId:number){
+  const data=await prisma.hDFCBank.findUnique({
+    where:{userId}
+  })
+
+  return data?.amount ?? 0;
+}
+
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
   const userId = Number(session?.user?.id);
@@ -37,10 +52,12 @@ export default async function Dashboard() {
     return <div className="p-10 text-center">Please log in to view your dashboard.</div>;
   }
 
-  const [balance, p2pCount, totalExpenses] = await Promise.all([
+  const [balance, p2pCount, totalExpenses,hAmount,axisAmount] = await Promise.all([
     getBalance(userId),
     getP2P(userId),
     totalP2P(userId),
+    getHdfcAmount(userId),
+    getAxisAmount(userId)
   ]);
 
   return (
@@ -57,12 +74,12 @@ export default async function Dashboard() {
       </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
+          <CardTitle className="text-sm font-medium">Bank Balance</CardTitle>
           <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{p2pCount}</div>
-          <p className="text-xs text-muted-foreground">+10.5% from last month</p>
+        <CardContent className="flex justify-around">
+          <div className="text-l ">HDFC: {hAmount/100}</div>
+          <div className="text-l ">Axis: {axisAmount/100}</div>
         </CardContent>
       </Card>
       <Card>
