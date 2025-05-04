@@ -8,7 +8,7 @@ export const OffRampTransactions = ({
     transactions: {
         time: Date,
         amount: number,
-        status: "Success" | "Failed" | "Processing";
+        status: "Success" | "Failure" | "Processing";
         provider: string;
     }[];
 }) => {
